@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import {
   Table,
   TableBody,
@@ -12,30 +15,18 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
+import { 
+  fetchIngredients,
+  addIngredient
+} from '../../redux/modules/ingredients';
+
 
 class Ingredients extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      tableData: [
-        {
-          name: "Red Onions",
-          tags: ["vegetable", "red"]
-        },
-        {
-          name: "Mangoes",
-          tags: ["fruit", "red"]
-        },
-        {
-          name: "Corriander Powder",
-          tags: ["Masala"]
-        },
-        {
-          name: "Red Onions",
-          tags: ["vegetable", "red"]
-        }
-      ],
+      tableData: [],
       showAddBox: false,
       newIngredient: {
         name: ""
@@ -53,13 +44,8 @@ class Ingredients extends Component {
   }
 
   addIngredient = () => {
-    this.setState({
-      tableData: this.state.tableData.concat([{
-        name: this.state.newIngredient.name,
-        tags: []
-      }])
-    })
-    this.clearIngredientName()
+    this.props.addIngredient({ name: this.state.newIngredient.name });
+    this.clearIngredientName();
   }
 
   clearIngredientName() {
@@ -76,6 +62,20 @@ class Ingredients extends Component {
         name: e.target.value
       }
     })
+  }
+
+  setIngredientsInTable(ingredients) {
+    var tableData = []
+    for (const key of Object.keys(ingredients)) {
+      const ingredient = ingredients[key]
+      ingredient.key = key
+      tableData = tableData.concat([
+        ingredient
+      ])
+    }
+    this.setState({
+      tableData: tableData
+    });
   }
 
   renderAddBox() {
@@ -166,10 +166,10 @@ class Ingredients extends Component {
           stripedRows={tableState.stripedRows}
         >
           {this.state.tableData.map( (row, index) => (
-            <TableRow key={index}>
+            <TableRow key={row.key}>
               <TableRowColumn>{row.name}</TableRowColumn>
               <TableRowColumn>
-                {row.tags.join(", ")}
+                {row.tags ? row.tags.join(", "):""}
               </TableRowColumn>
             </TableRow>
             ))}
@@ -178,6 +178,14 @@ class Ingredients extends Component {
     )
   }
 
+  componentWillMount() {
+    this.props.fetchIngredients();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { ingredients } = nextProps;
+    this.setIngredientsInTable(ingredients)
+  }
 
   render() {
 
@@ -192,4 +200,17 @@ class Ingredients extends Component {
 }
 
 
-export default Ingredients;
+const mapStateToProps = (state) => {
+  return {
+    ingredients: state.ingredients.ingredients
+  };
+}
+
+const mapDispatchToProps = (dispatch) => (
+    bindActionCreators({
+      fetchIngredients: fetchIngredients,
+      addIngredient: addIngredient
+    }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Ingredients);

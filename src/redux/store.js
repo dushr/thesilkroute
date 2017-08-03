@@ -2,9 +2,12 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { routerReducer, routerMiddleware } from 'react-router-redux';
 
+import { ingredientReducer } from './modules/ingredients';
+
 export function configureStore(history, initialState) {
   const reducer = combineReducers({
-    routing: routerReducer 
+    routing: routerReducer,
+    ingredients: ingredientReducer
   });
 
   const store = createStore(
