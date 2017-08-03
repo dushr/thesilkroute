@@ -8,7 +8,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 
-import FlatButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
@@ -59,7 +59,7 @@ class Ingredients extends Component {
         tags: []
       }])
     })
-    this.closeAddBox()
+    this.clearIngredientName()
   }
 
   clearIngredientName() {
@@ -81,6 +81,11 @@ class Ingredients extends Component {
   renderAddBox() {
     const actions = [
       <FlatButton
+        label="Close"
+        secondary={true}
+        onTouchTap={this.closeAddBox}
+      />,
+      <FlatButton
         label="Add"
         primary={true}
         onTouchTap={this.addIngredient}
@@ -93,7 +98,6 @@ class Ingredients extends Component {
         modal={false}
         open={this.state.showAddBox}
         onRequestClose={this.closeAddBox}
-        contentStyle={{width: "25%"}}
         actions={actions}
       >
         <TextField
@@ -145,6 +149,7 @@ class Ingredients extends Component {
             <FlatButton
               label="Add"
               onTouchTap={this.openAddBox}
+              primary={true}
             />
           </TableHeaderColumn>
         </TableRow>
