@@ -10,6 +10,7 @@ import {
 
 import FlatButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
 
 
 class Ingredients extends Component {
@@ -35,7 +36,10 @@ class Ingredients extends Component {
           tags: ["vegetable", "red"]
         }
       ],
-      showAddBox: false
+      showAddBox: false,
+      newIngredient: {
+        name: ""
+      }
     }
   }
 
@@ -45,11 +49,63 @@ class Ingredients extends Component {
 
   closeAddBox = () => {
     this.setState({showAddBox: false});
+    this.clearIngredientName()
   }
 
+  addIngredient = () => {
+    this.setState({
+      tableData: this.state.tableData.concat([{
+        name: this.state.newIngredient.name,
+        tags: []
+      }])
+    })
+    this.closeAddBox()
+  }
 
-  render() {
+  clearIngredientName() {
+    this.setState({
+      newIngredient: {
+        name: ""
+      }
+    })
+  }
 
+  setIngredientName = (e) => {
+    this.setState({
+      newIngredient: {
+        name: e.target.value
+      }
+    })
+  }
+
+  renderAddBox() {
+    const actions = [
+      <FlatButton
+        label="Add"
+        primary={true}
+        onTouchTap={this.addIngredient}
+      />
+    ];
+
+    return (
+      <Dialog
+        title="Add Ingredient"
+        modal={false}
+        open={this.state.showAddBox}
+        onRequestClose={this.closeAddBox}
+        contentStyle={{width: "25%"}}
+        actions={actions}
+      >
+        <TextField
+          hintText="Name"
+          value={this.state.newIngredient.name}
+          onChange={this.setIngredientName}
+        />
+      </Dialog>
+    )
+  }
+
+  renderTable() {
     const tableState = {
       fixedHeader: true,
       fixedFooter: true,
@@ -60,69 +116,70 @@ class Ingredients extends Component {
       enableSelectAll: false,
       deselectOnClickaway: true,
       showCheckboxes: false,
-      height: '300px',
     };
+
+    return (
+      <Table
+        height={tableState.height}
+        fixedHeader={tableState.fixedHeader}
+        fixedFooter={tableState.fixedFooter}
+        selectable={tableState.selectable}
+        multiSelectable={tableState.multiSelectable}
+      >
+        <TableHeader
+          displaySelectAll={tableState.showCheckboxes}
+          adjustForCheckbox={tableState.showCheckboxes}
+          enableSelectAll={tableState.enableSelectAll}
+        >
+        <TableRow>
+          <TableHeaderColumn>
+            <span
+              style={{
+                fontSize: '1.5rem'
+              }}
+            >
+              Ingredients
+            </span>
+          </TableHeaderColumn>
+          <TableHeaderColumn style={{ textAlign: 'right' }}>
+            <FlatButton
+              label="Add"
+              onTouchTap={this.openAddBox}
+            />
+          </TableHeaderColumn>
+        </TableRow>
+
+          <TableRow>
+            <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
+            <TableHeaderColumn tooltip="Tags">Status</TableHeaderColumn>
+          </TableRow>
+        </TableHeader>
+        <TableBody
+          displayRowCheckbox={tableState.showCheckboxes}
+          deselectOnClickaway={tableState.deselectOnClickaway}
+          showRowHover={tableState.showRowHover}
+          stripedRows={tableState.stripedRows}
+        >
+          {this.state.tableData.map( (row, index) => (
+            <TableRow key={index}>
+              <TableRowColumn>{row.name}</TableRowColumn>
+              <TableRowColumn>
+                {row.tags.join(", ")}
+              </TableRowColumn>
+            </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    )
+  }
+
+
+  render() {
+
     return (
       <div>
-        <Dialog
-          title="Add Ingredient"
-          modal={false}
-          open={this.state.showAddBox}
-          onRequestClose={this.closeAddBox}
-        >
-          TODO: Add Ingredients 
-        </Dialog>
-        <Table
-          height={tableState.height}
-          fixedHeader={tableState.fixedHeader}
-          fixedFooter={tableState.fixedFooter}
-          selectable={tableState.selectable}
-          multiSelectable={tableState.multiSelectable}
-        >
-          <TableHeader
-            displaySelectAll={tableState.showCheckboxes}
-            adjustForCheckbox={tableState.showCheckboxes}
-            enableSelectAll={tableState.enableSelectAll}
-          >
-          <TableRow>
-            <TableHeaderColumn>
-              <span
-                style={{
-                  fontSize: '1.5rem'
-                }}
-              >
-                Ingredients
-              </span>
-            </TableHeaderColumn>
-            <TableHeaderColumn style={{ textAlign: 'right' }}>
-              <FlatButton
-                label="Add"
-                onTouchTap={this.openAddBox}
-              />
-            </TableHeaderColumn>
-          </TableRow>
-
-            <TableRow>
-              <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Tags">Status</TableHeaderColumn>
-            </TableRow>
-          </TableHeader>
-          <TableBody
-            displayRowCheckbox={tableState.showCheckboxes}
-            deselectOnClickaway={tableState.deselectOnClickaway}
-            showRowHover={tableState.showRowHover}
-            stripedRows={tableState.stripedRows}
-          >
-            {this.state.tableData.map( (row, index) => (
-              <TableRow key={index}>
-                <TableRowColumn>{row.name}</TableRowColumn>
-                <TableRowColumn>
-                  {row.tags.join(", ")}
-                </TableRowColumn>
-              </TableRow>
-              ))}
-          </TableBody>
-        </Table>
+        {this.renderAddBox()}
+        {this.renderTable()}
       </div>
     )
   }
